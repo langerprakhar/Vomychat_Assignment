@@ -35,7 +35,7 @@ User.init({
     type: DataTypes.INTEGER,
     allowNull: true,
     references: {
-      model: 'Users', // ✅ MATCHES your table name correctly
+      model: 'Users', 
       key: 'id',
     },
     onDelete: 'SET NULL'

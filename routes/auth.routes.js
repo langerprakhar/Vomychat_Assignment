@@ -7,4 +7,4 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 
-module.exports = router; // Export the router directly, not as an object
+module.exports = router; 

@@ -4,14 +4,13 @@ const { User, Referral } = require("../models");
 const { generateReferralCode } = require("../utils/referral");
 const { v4: uuidv4 } = require("uuid");
 const validator = require("validator");
-const xss = require("xss"); // ✅ Import xss for XSS protection
+const xss = require("xss"); //Imported xss for XSS protection
 const { sendPasswordResetEmail } = require("../utils/email");
 
 exports.register = async (req, res) => {
   try {
     let { username, email, password, referral_code } = req.body;
 
-    // ✅ Sanitize inputs to prevent XSS attacks
     username = xss(validator.escape(username));
     email = xss(validator.escape(email));
     referral_code = referral_code ? xss(validator.escape(referral_code)) : null;
@@ -54,7 +53,7 @@ exports.register = async (req, res) => {
       }
     }
 
-    // Create new user
+    // Creates a new user
     const user = await User.create({
       username,
       email,
@@ -84,7 +83,6 @@ exports.login = async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    // ✅ Sanitize inputs
     email = xss(validator.escape(email));
 
     if (!process.env.JWT_SECRET) {
@@ -93,7 +91,6 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ where: { email } });
 
-    // Generic error message to prevent enumeration attacks
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -105,7 +102,6 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // Store JWT in a secure HttpOnly cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -113,7 +109,6 @@ exports.login = async (req, res) => {
       maxAge: 3600000, // 1 hour
     });
 
-    // ✅ ALSO RETURN TOKEN IN RESPONSE
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.error("Login Error:", error);
@@ -126,27 +121,24 @@ exports.forgotPassword = async (req, res) => {
   try {
     let { email } = req.body;
 
-    // ✅ Sanitize inputs
     email = xss(validator.escape(email));
 
     const user = await User.findOne({ where: { email } });
 
-    // Generic response to prevent email enumeration
     if (!user) {
       return res.status(200).json({ message: "If an account exists, a password reset email has been sent." });
     }
 
     const resetToken = uuidv4();
-    const resetTokenExpiresAt = new Date(Date.now() + 3600000); // Token expires in 1 hour
+    const resetTokenExpiresAt = new Date(Date.now() + 3600000); 
 
-    // Store the token and expiration in the database
     user.reset_token = resetToken;
     user.reset_token_expires_at = resetTokenExpiresAt;
     await user.save();
 
     const resetLink = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
 
-    // Send the password reset email
+    // Sends the password reset email
     await sendPasswordResetEmail(user.email, resetLink);
 
     res.status(200).json({ message: "If an account exists, a password reset email has been sent." });

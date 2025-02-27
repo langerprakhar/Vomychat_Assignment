@@ -13,7 +13,7 @@ Referral.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Users', // ✅ Correct table name
+      model: 'Users',
       key: 'id',
     },
     onDelete: 'CASCADE',
@@ -23,7 +23,7 @@ Referral.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Users', // ✅ Match the actual table name
+      model: 'Users', 
       key: 'id',
     },
     onDelete: 'CASCADE',

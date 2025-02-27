@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // change if using a different email service
+  service: 'gmail', 
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -24,9 +24,9 @@ const sendPasswordResetEmail = async (email, resetLink) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Password reset email sent: ${info.response}`);
+    console.log(`Password reset email sent: ${info.response}`);
   } catch (error) {
-    console.error(`❌ Error sending email: ${error.message}`);
+    console.error(`Error sending email: ${error.message}`);
   }
 };
 
